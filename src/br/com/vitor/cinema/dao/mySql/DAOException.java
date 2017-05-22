@@ -1,4 +1,4 @@
-package br.com.vitor.cinema.dao;
+package br.com.vitor.cinema.dao.mySql;
 
 public class DAOException extends Exception {
 	//criar getConnection

@@ -1,4 +1,4 @@
-package br.com.vitor.cinema.dao;
+package br.com.vitor.cinema.dao.mySql;
 
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -28,7 +28,7 @@ public abstract class DAO {
 		} catch (ClassNotFoundException e) {
 			throw new DAOException("Erro ao acessar BD, driver não encontrado. " + e.getMessage() + " - " + e.getClass().getName(), e);
 		} catch (SQLException e) {
-			throw new DAOException("Erro ao acessar BD, driver não encontrado. " + e.getMessage() + " - " + e.getClass().getName(), e);
+			throw new DAOException("Erro ao acessar BD, query inválida. " + e.getMessage() + " - " + e.getClass().getName(), e);
 		} catch (ConfigAppException e) {
 			throw new DAOException("Erro ao ler arquivo de configurações. " + e.getMessage() + " - " + e.getClass().getName(), e);
 		}
@@ -42,4 +42,14 @@ public abstract class DAO {
 		} catch (SQLException e) {
 		}
 	}
+	
+//	public static void main(String[] args) {
+//		DAO dao = new DAO();
+//		try {
+//			dao.getConnection();
+//			System.out.println("conectou");
+//		} catch (DAOException e) {
+//			e.printStackTrace();
+//		}
+//	}
 }
