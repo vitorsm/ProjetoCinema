@@ -19,6 +19,7 @@ public class Usuario {
 		this.codigo = codigo;
 	}
 
+	@BDColuna(nomeCampo = "NmUsuario", consideraNulo = false, likeCoringa = true, vazioNulo = false)
 	public String getNome() {
 		return nome;
 	}
@@ -27,6 +28,7 @@ public class Usuario {
 		this.nome = nome;
 	}
 
+	@BDColuna(nomeCampo = "UserName", consideraNulo = false, likeCoringa = false, vazioNulo = true)
 	public String getUserName() {
 		return userName;
 	}
@@ -35,6 +37,7 @@ public class Usuario {
 		this.userName = userName;
 	}
 
+	@BDColuna(nomeCampo = "Senha", consideraNulo = false, likeCoringa = false, vazioNulo = true)
 	public String getSenha() {
 		return senha;
 	}
