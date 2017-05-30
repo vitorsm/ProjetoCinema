@@ -12,13 +12,13 @@ import br.com.vitor.cinema.entidade.anotacoes.BDTabela;
 @BDTabela(nomeTabela = "Filme")
 public class Filme {
 
-	public int codigo;
-	public String nome;
-	public Usuario autor;
-	public int duracao; // Duração em minutos
-	public Date lancamento;
-	public List<Lingua> linguasLegenda;
-	public List<Lingua> linguasAudio;
+	private int codigo;
+	private String nome;
+	private Usuario autor;
+	private int duracao; // Duração em minutos
+	private Date lancamento;
+	private List<Lingua> linguasLegenda;
+	private List<Lingua> linguasAudio;
 
 	@BDPrimaryKey()
 	@BDColuna(consideraNulo = false, nomeCampo = "CodFilme", likeCoringa = false, vazioNulo = true)

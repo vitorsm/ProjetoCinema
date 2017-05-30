@@ -36,16 +36,14 @@ public class ConfigApp {
 		}
 	}
 	
-	public String getPropertie(String propName) {
-		return properties.getProperty(propName);
+	public String getPropertie(String propName) throws ConfigAppException {
+		String strPropertie = properties.getProperty(propName);
+		
+		if (strPropertie == null) {
+			throw new ConfigAppException("Não foi possível localizar a propriedade " + propName + " no arquivo de configuração");
+		}
+		
+		return strPropertie;
 	}
 	
-	
-	public static void main(String[] args) throws ConfigAppException {
-		ConfigApp c = ConfigApp.instance();
-		System.out.println(c.getPropertie("usuario"));
-		System.out.println(c.getPropertie("senha"));
-		System.out.println(c.getPropertie("nomeBD"));
-		System.out.println(c.getPropertie("senhaBD"));
-	}
 }

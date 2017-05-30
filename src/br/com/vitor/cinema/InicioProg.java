@@ -1,5 +1,7 @@
 package br.com.vitor.cinema;
 
-public class InicioProg {
+import br.com.vitor.cinema.entidade.Usuario;
 
+public class InicioProg {
+	
 }

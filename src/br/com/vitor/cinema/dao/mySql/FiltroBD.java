@@ -2,9 +2,15 @@ package br.com.vitor.cinema.dao.mySql;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import br.com.vitor.cinema.dao.FiltroBusca;
+import br.com.vitor.cinema.entidade.Filme;
 import br.com.vitor.cinema.entidade.anotacoes.BDColuna;
 import br.com.vitor.cinema.entidade.anotacoes.BDPrimaryKey;
 
@@ -12,13 +18,17 @@ public class FiltroBD implements FiltroBusca {
 	private Object obj;
 	private boolean isPrimaryKey;
 	
-	protected FiltroBD(Object obj) {
+	public FiltroBD(Object obj) {
 		this.obj= obj;
 	}
 	
 	@Override
-	public String getWhere() {
+	public PreparedStatement getPreparedStatement(Connection conn, String sql) throws FiltroException {
+//	public String getWhere() {
 		String where = null;
+		List<String> camposWhere = new ArrayList<String>();
+		List<Boolean> coringa = new ArrayList<Boolean>();
+		
 		isPrimaryKey = false;
 		
 		Class<?> classe = obj.getClass();
@@ -27,9 +37,6 @@ public class FiltroBD implements FiltroBusca {
 		
 		for (Method method : classe.getMethods()) {
 			String whereAux = where;
-//			if (method.isAnnotationPresent(BDPrimaryKey.class)) {
-//				isPrimaryKey = true;
-//			} else 
 			if (method.isAnnotationPresent(BDColuna.class)) {
 				boolean atualFK = false;
 				if (method.isAnnotationPresent(BDPrimaryKey.class)) {
@@ -37,6 +44,8 @@ public class FiltroBD implements FiltroBusca {
 					if (!isPrimaryKey) {
 						where = null;
 						isPrimaryKey = true;
+//						camposWhere.removeAll(camposWhere);
+//						coringa.removeAll(coringa);
 					}
 				}
 				
@@ -72,26 +81,55 @@ public class FiltroBD implements FiltroBusca {
 						if (!isPrimaryKey || (isPrimaryKey && atualFK)) {
 							if (str == null) {
 								if (bdColuna.consideraNulo()) {
+//									str = "=NULL";
+//									
+//									where = iniciaWhere(where) + 
+//											bdColuna.nomeCampo() + str;
+									
 									str = "=NULL";
 									
 									where = iniciaWhere(where) + 
-											bdColuna.nomeCampo() + str;
+											bdColuna.nomeCampo() + "=?";
 									
+									camposWhere.add(null);
+									coringa.add(false);
 									if (isPrimaryKey) {
 										foiFK = true;
 									}
 								}
 							} else {
+//								if (!str.equals("NULL")) {
+//									if (bdColuna.likeCoringa()) {
+//										str = " LIKE '%" + str + "%'";
+//									} else {
+//										str = "='" + str + "'";
+//									}
+//								}
+//								
+//								where = iniciaWhere(where) + 
+//										bdColuna.nomeCampo() + str;
+								
 								if (!str.equals("NULL")) {
+									camposWhere.add(str);
+									
 									if (bdColuna.likeCoringa()) {
-										str = " LIKE '%" + str + "%'";
+										str = " LIKE ?";
+										coringa.add(true);
 									} else {
-										str = "='" + str + "'";
+										str = "=?";
+										coringa.add(false);
 									}
+									
+									where = iniciaWhere(where) + 
+											bdColuna.nomeCampo() + str;
+									
+								} else {
+									camposWhere.add(null);
+									coringa.add(false);
+									where = iniciaWhere(where) + 
+											bdColuna.nomeCampo() + str;
 								}
 								
-								where = iniciaWhere(where) + 
-										bdColuna.nomeCampo() + str;
 								if (isPrimaryKey) {
 									foiFK = true;
 								}
@@ -107,6 +145,14 @@ public class FiltroBD implements FiltroBusca {
 			if (isPrimaryKey && !foiFK) {
 				isPrimaryKey = false;
 				where = whereAux;
+			} else {
+				if (isPrimaryKey && foiFK) {
+					int tam = camposWhere.size() - 1;
+					for (int i = 0; i < tam; i++) {
+						camposWhere.remove(0);
+						coringa.remove(0);
+					}
+				}
 			}
 		}
 		
@@ -114,7 +160,26 @@ public class FiltroBD implements FiltroBusca {
 			where = " 1";
 		}
 		
-		return where;
+//		return where;
+		
+		try {
+			PreparedStatement ps = conn.prepareStatement(String.format(sql, where));
+			for (int i = 0; i < camposWhere.size(); i++) {
+				if (camposWhere.get(i) == null) {
+					ps.setString(i + 1, "NULL");
+				} else {
+					if (coringa.get(i)) {
+						ps.setString(i + 1, '%' + camposWhere.get(i) + '%');
+					} else {
+						ps.setString(i + 1, camposWhere.get(i));
+					}
+				}
+			}
+			
+			return ps;
+		} catch (SQLException e) {
+			throw new FiltroException("Falha ao buscar dados no BD - SQL: " + sql + " - WHERE: " + where, e);
+		}
 	}
 	
 	private String getPrimaryKey(Object obj) throws DadoNaoCorrespondenteException {
@@ -242,5 +307,4 @@ public class FiltroBD implements FiltroBusca {
 			return where + " AND ";
 		}
 	}
-	
 }
