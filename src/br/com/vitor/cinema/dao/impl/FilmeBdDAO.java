@@ -25,11 +25,11 @@ public class FilmeBdDAO extends DAO implements FilmeDAO {
 	public final static String TAB_FILME = "F";
 	
 	private final static String SQL_INSERT = "INSERT INTO Filme "
-			+ "(NmFilme, Lancamento, Duracao, Autor_CodUsuario) "
-			+ "VALUES (?, ?, ?, ?)";
+			+ "(NmFilme, Lancamento, Duracao, Sinopse, Autor_CodUsuario) "
+			+ "VALUES (?, ?, ?, ?, ?)";
 
 	private final static String SQL_UPDATE = "UPDATE Filme SET "
-			+ "NmFilme=?, Lancamento=?, Duracao=?, Autor_CodUsuario=? "
+			+ "NmFilme=?, Lancamento=?, Duracao=?, Sinopse=?, Autor_CodUsuario=? "
 			+ "WHERE CodFilme=?";
 	
 	private final static String SQL_DELETE = "DELETE FROM Filme "
@@ -37,7 +37,8 @@ public class FilmeBdDAO extends DAO implements FilmeDAO {
 	
 	private final static String SQL_SELECT = "SELECT * FROM Filme AS " + TAB_FILME
 			+ " LEFT JOIN Usuario AS " + UsuarioBdDAO.TAB_USUARIO + " ON "
-			+ TAB_FILME + ".Autor_CodUsuario=" + UsuarioBdDAO.TAB_USUARIO + ".CodUsuario WHERE %s"; //String.format(
+			+ TAB_FILME + ".Autor_CodUsuario=" + UsuarioBdDAO.TAB_USUARIO + ".CodUsuario WHERE %s "
+					+ "ORDER BY NmFilme"; //String.format(
 	
 	
 	@Override
@@ -60,11 +61,12 @@ public class FilmeBdDAO extends DAO implements FilmeDAO {
 			ps.setString(1, t.getNome());
 			ps.setDate(2, dataLancamento);
 			ps.setInt(3, t.getDuracao());
+			ps.setString(4,  t.getSinopse());
 			
 			if (t.getAutor() != null && t.getAutor().getCodigo() > 0) {
-				ps.setInt(4, t.getAutor().getCodigo());
+				ps.setInt(5, t.getAutor().getCodigo());
 			} else {
-				ps.setString(4, NULL);
+				ps.setString(5, NULL);
 			}
 			
 			ps.execute();
@@ -100,14 +102,15 @@ public class FilmeBdDAO extends DAO implements FilmeDAO {
 			ps.setString(1, t.getNome());
 			ps.setDate(2, dataLancamento);
 			ps.setInt(3, t.getDuracao());
+			ps.setString(4, t.getSinopse());
 			
 			if (t.getAutor() != null && t.getAutor().getCodigo() > 0) {
-				ps.setInt(4, t.getAutor().getCodigo());
+				ps.setInt(5, t.getAutor().getCodigo());
 			} else {
-				ps.setString(4, NULL);
+				ps.setString(5, NULL);
 			}
 			
-			ps.setInt(5, t.getCodigo());
+			ps.setInt(6, t.getCodigo());
 			ps.execute();
 			
 		} catch (SQLException e) {
@@ -179,6 +182,8 @@ public class FilmeBdDAO extends DAO implements FilmeDAO {
 			filme.setDuracao(rs.getInt(TAB_FILME + ".Duracao"));
 			filme.setLancamento(rs.getDate(TAB_FILME + ".Lancamento"));
 			filme.setNome(rs.getString(TAB_FILME + ".NmFilme"));
+			filme.setSinopse(rs.getString(TAB_FILME + ".Sinopse"));
+			
 		} catch (SQLException ex) {
 			throw new DAOException("Erro ao instanciar novo objeto com o ResultSet: " + ex.getMessage(), ex);
 		}

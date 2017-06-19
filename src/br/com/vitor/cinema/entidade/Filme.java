@@ -19,6 +19,7 @@ public class Filme {
 	private Date lancamento;
 	private List<Lingua> linguasLegenda;
 	private List<Lingua> linguasAudio;
+	private String sinopse;
 
 	@BDPrimaryKey()
 	@BDColuna(consideraNulo = false, nomeCampo = "CodFilme", likeCoringa = false, vazioNulo = true)
@@ -81,6 +82,14 @@ public class Filme {
 
 	public List<Lingua> getLinguasAudio() {
 		return linguasAudio;
+	}
+	
+	public String getSinopse() {
+		return sinopse;
+	}
+
+	public void setSinopse(String sinopse) {
+		this.sinopse = sinopse;
 	}
 
 	public void addLinguaAudio(Lingua lingua) {

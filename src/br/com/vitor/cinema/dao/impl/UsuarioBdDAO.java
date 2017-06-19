@@ -159,7 +159,6 @@ public class UsuarioBdDAO extends DAO implements UsuarioDAO {
 			ps = filtro.getPreparedStatement(conn, SQL_SELECT);
 			rs = ps.executeQuery();
 			
-			
 			while (rs.next()) {
 				Usuario usuario = instance(rs);
 				

@@ -7,16 +7,16 @@ import javax.swing.JOptionPane;
 
 import br.com.vitor.cinema.dao.DAOFactory;
 import br.com.vitor.cinema.dao.DAOFactoryException;
-import br.com.vitor.cinema.dao.UsuarioDAO;
+import br.com.vitor.cinema.dao.FilmeDAO;
 import br.com.vitor.cinema.dao.mySql.DAOException;
 import br.com.vitor.cinema.dao.mySql.FiltroBD;
-import br.com.vitor.cinema.entidade.Usuario;
+import br.com.vitor.cinema.entidade.Filme;
 
-public class UsuarioCadastroJFrame extends CadastroJFrame {
-	private UsuarioDAO usuarioDAO;
+public class FilmeCadastroJFrame extends CadastroJFrame {
+	private FilmeDAO filmeDAO;
 	
-	public UsuarioCadastroJFrame() {
-		super("Cadastro de usuário");
+	public FilmeCadastroJFrame() {
+		super("Cadastro de filmes");
 		
 		try {
 			String descricao = this.getTextoDescricao();
@@ -30,19 +30,19 @@ public class UsuarioCadastroJFrame extends CadastroJFrame {
 	
 	@Override
 	protected void instanciaModeloTabela() {
-		this.modeloTabela = new ModeloPadrao<Usuario>(new String[]{"Código", "Nome", "UserName"}) {
+		this.modeloTabela = new ModeloPadrao<Filme>(new String[]{"Código", "Nome", "Sinopse"}) {
 			@Override
 			public Object getValueAt(int linha, int coluna) {
 				if (linha < this.objetos.size()) {
-					Usuario usuario = objetos.get(linha);
+					Filme filme = objetos.get(linha);
 					
 					switch (coluna) {
 					case 0:
-						return usuario.getCodigo() + "";
+						return filme.getCodigo() + "";
 					case 1:
-						return usuario.getNome();
+						return filme.getNome();
 					case 2:
-						return usuario.getUserName();
+						return filme.getSinopse();
 					default:
 						return null;
 					}
@@ -55,28 +55,28 @@ public class UsuarioCadastroJFrame extends CadastroJFrame {
 	}
 	
 	public static void main(String[] args) {
-		UsuarioCadastroJFrame tela = new UsuarioCadastroJFrame();
+		FilmeCadastroJFrame tela = new FilmeCadastroJFrame();
 		tela.setVisible(true);
 	}
 
 	@Override
 	public void preencheTabela(String descricao) throws DAOFactoryException, DAOException {
-		Usuario usuario = new Usuario();
+		Filme filme = new Filme();
 		try {
 			int cod = Integer.parseInt(descricao);
-			usuario.setCodigo(cod);
+			filme.setCodigo(cod);
 		} catch (NumberFormatException ex) {
-			usuario.setNome(descricao);
+			filme.setNome(descricao);
 		}
 		
-		FiltroBD filtroBD = new FiltroBD(usuario);
+		FiltroBD filtroBD = new FiltroBD(filme);
 		
-		if (usuarioDAO == null) {
-			usuarioDAO = DAOFactory.getUsuarioDAO();
+		if (filmeDAO == null) {
+			filmeDAO = DAOFactory.getFilmeDAO();
 		}
 		
-		List<Usuario> usuarios = usuarioDAO.consultar(filtroBD);
-		this.modeloTabela.addObjetos(usuarios);
+		List<Filme> filmes = filmeDAO.consultar(filtroBD);
+		this.modeloTabela.addObjetos(filmes);
 		
 		this.setEnabledBotoes(false);
 	}
